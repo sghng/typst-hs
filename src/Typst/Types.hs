@@ -39,6 +39,7 @@ module Typst.Types
     Horiz (..),
     Vert (..),
     Color (..),
+    Stroke (..),
     Direction (..),
     Identifier (..), -- reexported
     lookupIdentifier,
@@ -115,6 +116,8 @@ data Val
   -- only @rgb@, @cmyk@, and @luma@ are available. 
   -- See issue [#35](https://github.com/jgm/typst-hs/issues/35#issuecomment-1926182040).
   | VColor !Color
+  -- | A @stroke@ value, representing stroke properties for shapes and lines.
+  | VStroke !Stroke
   -- | A @symbol@ value, representing a Unicode symbol.
   | VSymbol !Symbol
   -- | A UTF-8 encoded text @string@.
@@ -191,6 +194,7 @@ data ValType
   | TAngle
   | TFraction
   | TColor
+  | TStroke
   | TSymbol
   | TString
   | TRegex
@@ -230,6 +234,7 @@ valType v =
     VAngle {} -> TAngle
     VFraction {} -> TFraction
     VColor {} -> TColor
+    VStroke {} -> TStroke
     VSymbol {} -> TSymbol
     VString {} -> TString
     VRegex {} -> TRegex
@@ -828,6 +833,12 @@ data Color
   | Luma Rational
   deriving (Show, Eq, Ord, Typeable)
 
+data Stroke
+  = StrokeColor Color
+  | StrokeLength Length
+  | StrokeDict (OM.OMap Identifier Val)
+  deriving (Show, Eq, Typeable)
+
 data Direction 
   = Ltr -- ^ Left to right
   | Rtl -- ^ Right to left
@@ -906,6 +917,9 @@ prettyVal expr =
         <> text (toPercent k)
         <> ")"
     VColor (Luma g) -> "luma(" <> text (toPercent g) <> ")"
+    VStroke (StrokeColor col) -> prettyVal (VColor col)
+    VStroke (StrokeLength len) -> prettyVal (VLength len)
+    VStroke (StrokeDict dict) -> "stroke(" <> text (T.pack $ show dict) <> ")"
     VModule (Identifier modid) _ -> "<module " <> text modid <> ">"
     VArguments args ->
       P.parens

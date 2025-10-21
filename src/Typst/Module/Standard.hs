@@ -400,6 +400,7 @@ types =
   , ("length", VType TLength)
   , ("alignment", VType TAlignment)
   , ("color", VType TColor)
+  , ("stroke", VType TStroke)
   , ("symbol", VType TSymbol)
   , ("str", VType TString)
   , ("label", VType TLabel)
@@ -539,6 +540,15 @@ construct =
                 )
                   <|> (nthArg 1 >>= hexToRGB)
               )
+    ),
+    ( "stroke",
+      makeFunction $ do
+        arg <- nthArg 1
+        VStroke <$> case arg of
+          VColor col -> pure $ StrokeColor col
+          VLength len -> pure $ StrokeLength len
+          VDict dict -> pure $ StrokeDict dict
+          _ -> fail "stroke function requires a color, length, or dictionary as argument"
     ),
     ( "lorem",
       makeFunction $ do
