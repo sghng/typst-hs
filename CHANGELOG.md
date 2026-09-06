@@ -1,5 +1,20 @@
 # Revision history for typst-hs
 
+## Unreleased
+
+  * Add support for the stroke type (#76):
+
+    + New `VStroke` value and `stroke` type.
+    + `stroke()` constructor accepting a stroke, color, length, or
+      dictionary, plus named arguments `paint`, `thickness`, `dash`,
+      `cap`, `join`, and `miter-limit`.
+    + Field access on strokes (`paint`, `thickness`, `dash`, `cap`,
+      `join`, `miter-limit`).
+    + `length + color` now evaluates to a stroke value instead of a
+      dictionary; strokes can be combined with colors, lengths, and
+      other strokes, with the right operand's fields taking
+      precedence.
+
 ## 0.11.0.1
 
   * Fix `calc.pow` so it accepts negative exponents (#102).
