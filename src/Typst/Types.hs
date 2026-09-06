@@ -40,6 +40,9 @@ module Typst.Types
     Vert (..),
     Color (..),
     Stroke (..),
+    DashPattern (..),
+    defaultStroke,
+    mergeStrokes,
     Direction (..),
     Identifier (..), -- reexported
     lookupIdentifier,
@@ -412,6 +415,8 @@ instance Compare Val where
   comp (VAngle x1) (VAngle x2) = Just $ compare x1 x2
   comp (VFraction x1) (VFraction x2) = Just $ compare x1 x2
   comp (VColor c1) (VColor c2) = Just $ compare c1 c2
+  comp (VStroke s1) (VStroke s2) =
+    if s1 == s2 then Just EQ else Nothing
   comp (VSymbol (Symbol s1 _ _)) (VSymbol (Symbol s2 _ _)) = Just $ compare s1 s2
   comp (VString s1) (VString s2) = Just $ compare s1 s2
   comp (VPath p1) (VPath p2) = Just $ compare p1 p2
@@ -835,9 +840,37 @@ data Color
 
 data Stroke = Stroke
   { paint :: !Color,
-    thickness :: !Length
+    thickness :: !Length,
+    dash :: !(Maybe DashPattern),
+    cap :: !(Maybe Text),
+    join :: !(Maybe Text),
+    miterLimit :: !(Maybe Double)
   }
   deriving (Show, Eq, Typeable)
+
+data DashPattern
+  = NamedDash !Text
+  | LengthDash ![Length]
+  deriving (Show, Eq, Typeable)
+
+-- | The default stroke: 1pt black, solid.
+defaultStroke :: Stroke
+defaultStroke = Stroke (RGB 0 0 0 1) (LExact 1.0 LPt) Nothing Nothing Nothing Nothing
+
+-- | Merge two strokes; fields of the second take precedence.
+mergeStrokes :: Stroke -> Stroke -> Stroke
+mergeStrokes s1 s2 =
+  Stroke
+    { paint = paint s2,
+      thickness = thickness s2,
+      dash = orElse (dash s2) (dash s1),
+      cap = orElse (cap s2) (cap s1),
+      join = orElse (join s2) (join s1),
+      miterLimit = orElse (miterLimit s2) (miterLimit s1)
+    }
+  where
+    orElse (Just x) _ = Just x
+    orElse Nothing y = y
 
 data Direction 
   = Ltr -- ^ Left to right
@@ -896,6 +929,26 @@ prettyVal expr =
     VFunction _ _ _ -> mempty
     VLabel t -> text $ "<" <> t <> ">"
     VCounter _ -> mempty
+    VStroke s ->
+      "stroke("
+        <> P.cat
+          ( P.punctuate ", " $
+              [ "paint: " <> prettyVal (VColor (paint s)),
+                "thickness: " <> prettyVal (VLength (thickness s))
+              ]
+                ++ [ "dash: " <> dashDoc d | Just d <- [dash s] ]
+                ++ [ "cap: " <> prettyVal (VString c) | Just c <- [cap s] ]
+                ++ [ "join: " <> prettyVal (VString j) | Just j <- [join s] ]
+                ++ [ "miter-limit: " <> P.text (show m) | Just m <- [miterLimit s] ]
+          )
+        <> ")"
+      where
+        dashDoc (NamedDash t) = prettyVal (VString t)
+        dashDoc (LengthDash ls) =
+          P.parens $
+            P.cat $
+              P.punctuate ", " $
+                map (\l -> text (renderLength False l)) ls
     VColor (RGB r g b o) ->
       "rgb("
         <> text (toPercent r)

@@ -154,11 +154,18 @@ getMethod updateVal val fld = do
             CMYK c m y k -> CMYK (1 - c) (1 - m) (1 - y) k
             Luma x -> Luma (1 - x)
         _ -> noMethod "Color" fld
-    VStroke (Stroke paint thickness) ->
+    VStroke s ->
       case fld of
-        "paint" -> pure $ VColor paint
-        "thickness" -> pure $ VLength thickness
+        "paint" -> pure $ VColor (paint s)
+        "thickness" -> pure $ VLength (thickness s)
+        "dash" -> pure $ maybe VNone dashToVal (dash s)
+        "cap" -> pure $ maybe VNone VString (cap s)
+        "join" -> pure $ maybe VNone VString (join s)
+        "miter-limit" -> pure $ maybe VNone VFloat (miterLimit s)
         _ -> fail $ "Stroke does not have method '" <> T.unpack fld <> "'"
+      where
+        dashToVal (NamedDash t) = VString t
+        dashToVal (LengthDash ls) = VArray (V.fromList (map VLength ls))
     VString t -> do
       let toPos n =
             if n < 0

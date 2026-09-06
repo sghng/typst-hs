@@ -544,32 +544,21 @@ construct =
     ( "stroke",
       makeFunction $ do
         mbStroke <- (Just <$> nthArg 1) `mplus` pure Nothing
-
-        mbPaint <- namedArg "paint" Nothing
-        let paint = case mbPaint of
-              Just (VColor c) -> c
-              _ -> RGB 0 0 0 1
-
-        mbThickness <- namedArg "thickness" Nothing
-        let thickness = case mbThickness of
-              Just (VLength l) -> l
-              _ -> LExact 1.0 LPt
-
         (paint, thickness) <- pure $ case mbStroke of
-              Nothing -> (paint, thickness)
-              Just (VStroke (Stroke paint thickness)) -> (paint, thickness)
-              Just (VColor paint) -> (paint, thickness)
-              Just (VLength thickness) -> (paint, thickness)
-              Just (VDict m) -> 
+              Nothing -> (paint defaultStroke, thickness defaultStroke)
+              Just (VStroke s) -> (paint s, thickness s)
+              Just (VColor c) -> (c, thickness defaultStroke)
+              Just (VLength l) -> (paint defaultStroke, l)
+              Just (VDict m) ->
                 let paint' = case OM.lookup "paint" m of
                       Just (VColor c) -> c
-                      _ -> paint
+                      _ -> paint defaultStroke
                     thickness' = case OM.lookup "thickness" m of
                       Just (VLength l) -> l
-                      _ -> thickness
+                      _ -> thickness defaultStroke
                 in (paint', thickness')
-              _ -> (paint, thickness)
-        pure $ VStroke $ Stroke paint thickness
+              _ -> (paint defaultStroke, thickness defaultStroke)
+        pure $ VStroke $ Stroke paint thickness Nothing Nothing Nothing Nothing
     ),
     ( "lorem",
       makeFunction $ do
@@ -770,3 +759,4 @@ getFileOrBytes = do
   case v of
     VBytes bs -> pure $ BL.fromStrict bs
     _ -> lift $ resolvePathVal v >>= loadResolvedLazyBytes
+
