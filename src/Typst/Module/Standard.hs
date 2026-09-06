@@ -543,22 +543,29 @@ construct =
     ),
     ( "stroke",
       makeFunction $ do
-        mbStroke <- (Just <$> nthArg 1) `mplus` pure Nothing
-        (paint, thickness) <- pure $ case mbStroke of
-              Nothing -> (paint defaultStroke, thickness defaultStroke)
-              Just (VStroke s) -> (paint s, thickness s)
-              Just (VColor c) -> (c, thickness defaultStroke)
-              Just (VLength l) -> (paint defaultStroke, l)
-              Just (VDict m) ->
-                let paint' = case OM.lookup "paint" m of
-                      Just (VColor c) -> c
-                      _ -> paint defaultStroke
-                    thickness' = case OM.lookup "thickness" m of
-                      Just (VLength l) -> l
-                      _ -> thickness defaultStroke
-                in (paint', thickness')
-              _ -> (paint defaultStroke, thickness defaultStroke)
-        pure $ VStroke $ Stroke paint thickness Nothing Nothing Nothing Nothing
+        base <-
+          nthArg 1 >>= \case
+            VNone -> pure defaultStroke
+            VStroke s -> pure s
+            VColor c -> pure defaultStroke { paint = c }
+            VLength l -> pure defaultStroke { thickness = l }
+            VDict m -> strokeFromDict m
+            _ -> fail "expected stroke, color, length, or dictionary"
+        mbPaint <- namedArg "paint" Nothing
+        mbThickness <- namedArg "thickness" Nothing
+        mbDash <- namedArg "dash" Nothing
+        mbCap <- namedArg "cap" Nothing
+        mbJoin <- namedArg "join" Nothing
+        mbMiterLimit <- namedArg "miter-limit" Nothing
+        paint <- maybe (pure $ paint base) asColor mbPaint
+        thickness <- maybe (pure $ thickness base) asLength mbThickness
+        dash <- maybe (pure $ dash base) (fmap Just . toDashPattern) mbDash
+        cap <- maybe (pure $ cap base) (fmap Just . toCap) mbCap
+        join <- maybe (pure $ join base) (fmap Just . toJoin) mbJoin
+        pure $
+          VStroke $
+            Stroke paint thickness dash cap join $
+              maybe (miterLimit base) id mbMiterLimit
     ),
     ( "lorem",
       makeFunction $ do
@@ -760,3 +767,68 @@ getFileOrBytes = do
     VBytes bs -> pure $ BL.fromStrict bs
     _ -> lift $ resolvePathVal v >>= loadResolvedLazyBytes
 
+-- | Build a 'Stroke' from a dictionary such as
+-- @(paint: red, thickness: 2pt, dash: "dashed")@.
+strokeFromDict :: MonadFail m => OM.OMap Identifier Val -> m Stroke
+strokeFromDict m = do
+  paint <- maybe (pure $ paint defaultStroke) asColor (OM.lookup "paint" m)
+  thickness <-
+    maybe (pure $ thickness defaultStroke) asLength (OM.lookup "thickness" m)
+  dash <- mapM toDashPattern (OM.lookup "dash" m)
+  cap <- mapM toCap (OM.lookup "cap" m)
+  join <- mapM toJoin (OM.lookup "join" m)
+  miterLimit <-
+    case OM.lookup "miter-limit" m of
+      Nothing -> pure Nothing
+      Just (VFloat x) -> pure (Just x)
+      Just (VInteger x) -> pure (Just (fromIntegral x))
+      Just _ -> fail "miter-limit must be a float"
+  pure $ Stroke paint thickness dash cap join miterLimit
+
+asColor :: MonadFail m => Val -> m Color
+asColor (VColor c) = pure c
+asColor _ = fail "paint must be a color"
+
+asLength :: MonadFail m => Val -> m Length
+asLength (VLength l) = pure l
+asLength _ = fail "thickness must be a length"
+
+toDashPattern :: MonadFail m => Val -> m DashPattern
+toDashPattern (VString t)
+  | t `elem` dashNames = pure $ NamedDash t
+  | otherwise =
+      fail $
+        "unknown dash pattern: " <> T.unpack t
+toDashPattern (VArray xs) = do
+  ls <-
+    mapM
+      (\case
+         VLength l -> pure l
+         _ -> fail "dash array must contain only lengths")
+      (V.toList xs)
+  pure $ LengthDash ls
+toDashPattern _ = fail "dash must be a string or an array of lengths"
+
+dashNames :: [Text]
+dashNames =
+  [ "solid",
+    "dotted",
+    "densely-dotted",
+    "loosely-dotted",
+    "dashed",
+    "densely-dashed",
+    "loosely-dashed",
+    "dash-dotted",
+    "densely-dash-dotted",
+    "loosely-dash-dotted"
+  ]
+
+toCap :: MonadFail m => Val -> m Text
+toCap (VString t)
+  | t `elem` (["butt", "round", "square"] :: [Text]) = pure t
+toCap _ = fail "cap must be \"butt\", \"round\", or \"square\""
+
+toJoin :: MonadFail m => Val -> m Text
+toJoin (VString t)
+  | t `elem` (["miter", "round", "bevel"] :: [Text]) = pure t
+toJoin _ = fail "join must be \"miter\", \"round\", or \"bevel\""
