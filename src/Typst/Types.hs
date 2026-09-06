@@ -484,14 +484,16 @@ instance Summable Val where
   maybePlus (VArray v1) (VArray v2) = pure $ VArray (v1 <> v2)
   maybePlus (VDict m1) (VDict m2) = pure $ VDict (m1 OM.<>| m2)
   -- Stroke: '1pt + red', and combinations with existing strokes.
-  -- Fields of the right operand take precedence.
+  -- (Extension of typst, where only color/gradient + length is allowed.)
+  -- A color or length sets the corresponding component of the stroke;
+  -- when two strokes are added, the right operand's fields take precedence.
   maybePlus (VColor c) (VLength l) =
     pure $ VStroke $ defaultStroke { paint = c, thickness = l }
   maybePlus (VLength l) (VColor c) = maybePlus (VColor c) (VLength l)
   maybePlus (VStroke s) (VColor c) = pure $ VStroke s { paint = c }
-  maybePlus (VColor _) (VStroke s) = pure $ VStroke s
+  maybePlus (VColor c) (VStroke s) = pure $ VStroke s { paint = c }
   maybePlus (VStroke s) (VLength l) = pure $ VStroke s { thickness = l }
-  maybePlus (VLength _) (VStroke s) = pure $ VStroke s
+  maybePlus (VLength l) (VStroke s) = pure $ VStroke s { thickness = l }
   maybePlus (VStroke s1) (VStroke s2) = pure $ VStroke $ mergeStrokes s1 s2
   maybePlus v1 v2 = fail $ "could not add " <> show v1 <> " and " <> show v2
 

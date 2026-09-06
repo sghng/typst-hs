@@ -326,10 +326,42 @@
                  (Ident (Identifier "red"))))
        , NormalArg (Literal (String "dotted"))
        ])
-, ParBreak
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 27 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "paint"))
+              (Plus
+                 (Ident (Identifier "red"))
+                 (FuncCall
+                    (Ident (Identifier "stroke"))
+                    [ KeyValArg (Identifier "dash") (Literal (String "dotted")) ])))
+       , NormalArg (Ident (Identifier "red"))
+       ])
+, SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
     ( line 28 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "thickness"))
+              (Plus
+                 (Literal (Numeric 2.0 Pt))
+                 (FuncCall
+                    (Ident (Identifier "stroke"))
+                    [ KeyValArg (Identifier "dash") (Literal (String "dotted")) ])))
+       , NormalArg (Literal (Numeric 2.0 Pt))
+       ])
+, ParBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 30 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -345,7 +377,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 29 , column 2 )
+    ( line 31 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -361,7 +393,7 @@
 , ParBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 31 , column 2 )
+    ( line 33 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -426,6 +458,12 @@ document(body: { parbreak(),
 ]), 
                  text(body: [✅]), 
                  parbreak(), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
                  text(body: [✅]), 
                  text(body: [
 ]), 

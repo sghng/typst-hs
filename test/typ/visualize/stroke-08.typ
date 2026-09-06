@@ -24,6 +24,8 @@
 #test((stroke(1pt + red) + blue).paint, blue)
 #test((stroke(1pt + red) + 2pt).thickness, 2pt)
 #test((stroke(dash: "dotted") + 1pt + red).dash, "dotted")
+#test((red + stroke(dash: "dotted")).paint, red)
+#test((2pt + stroke(dash: "dotted")).thickness, 2pt)
 
 #test(stroke(1pt) == stroke(1pt), true)
 #test(stroke(1pt) == stroke(2pt), false)
