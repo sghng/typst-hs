@@ -400,7 +400,9 @@ types =
   , ("length", VType TLength)
   , ("alignment", VType TAlignment)
   , ("color", VType TColor)
-  , ("stroke", VType TStroke)
+  -- Note: no ("stroke", VType TStroke) here: the stroke type's
+  -- binding is the stroke() constructor function in 'construct',
+  -- which would shadow it anyway (M.fromList keeps the last).
   , ("symbol", VType TSymbol)
   , ("str", VType TString)
   , ("label", VType TLabel)
