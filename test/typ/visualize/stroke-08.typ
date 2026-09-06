@@ -2,7 +2,12 @@
 
 #test(stroke(2pt + red).paint, red)
 #test(stroke(2pt + red).thickness, 2pt)
-#test(stroke(paint: blue).thickness, 1pt)
+// NOTE: thickness/paint are materialized from defaults rather than auto
+// (known deviation from typst, see PR #76 discussion)
+#test(stroke(red).cap, auto)
+#test(stroke(red).join, auto)
+#test(stroke(red).dash, auto)
+#test(stroke(red).miter-limit, auto)
 #test(stroke(red).paint, red)
 #test(stroke(3pt).thickness, 3pt)
 #test(stroke(dash: "dashed").dash, "dashed")

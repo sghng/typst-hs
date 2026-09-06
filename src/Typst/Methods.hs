@@ -158,10 +158,10 @@ getMethod updateVal val fld = do
       case fld of
         "paint" -> pure $ VColor (paint s)
         "thickness" -> pure $ VLength (thickness s)
-        "dash" -> pure $ maybe VNone dashToVal (dash s)
-        "cap" -> pure $ maybe VNone VString (cap s)
-        "join" -> pure $ maybe VNone VString (join s)
-        "miter-limit" -> pure $ maybe VNone VFloat (miterLimit s)
+        "dash" -> pure $ maybe VAuto dashToVal (dash s)
+        "cap" -> pure $ maybe VAuto VString (cap s)
+        "join" -> pure $ maybe VAuto VString (join s)
+        "miter-limit" -> pure $ maybe VAuto VFloat (miterLimit s)
         _ -> fail $ "Stroke does not have method '" <> T.unpack fld <> "'"
       where
         dashToVal (NamedDash t) = VString t
