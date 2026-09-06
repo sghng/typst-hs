@@ -483,10 +483,16 @@ instance Summable Val where
   maybePlus (VFraction f1) (VFraction f2) = pure $ VFraction (f1 + f2)
   maybePlus (VArray v1) (VArray v2) = pure $ VArray (v1 <> v2)
   maybePlus (VDict m1) (VDict m2) = pure $ VDict (m1 OM.<>| m2)
+  -- Stroke: '1pt + red', and combinations with existing strokes.
+  -- Fields of the right operand take precedence.
   maybePlus (VColor c) (VLength l) =
-    -- Stroke '1pt + red'
-    pure $ VDict $ OM.fromList [("thickness", VLength l), ("color", VColor c)]
+    pure $ VStroke $ defaultStroke { paint = c, thickness = l }
   maybePlus (VLength l) (VColor c) = maybePlus (VColor c) (VLength l)
+  maybePlus (VStroke s) (VColor c) = pure $ VStroke s { paint = c }
+  maybePlus (VColor _) (VStroke s) = pure $ VStroke s
+  maybePlus (VStroke s) (VLength l) = pure $ VStroke s { thickness = l }
+  maybePlus (VLength _) (VStroke s) = pure $ VStroke s
+  maybePlus (VStroke s1) (VStroke s2) = pure $ VStroke $ mergeStrokes s1 s2
   maybePlus v1 v2 = fail $ "could not add " <> show v1 <> " and " <> show v2
 
 class Multipliable a where

@@ -72,6 +72,6 @@ is the sun.]),
                                parbreak() }, 
                        clip: true, 
                        height: 4.0em, 
-                       stroke: (thickness: 1.0pt,
-                                color: rgb(0%,0%,0%,100%))), 
+                       stroke: stroke(paint: rgb(0%,0%,0%,100%), 
+                                      thickness: 1.0pt)), 
                  parbreak() })

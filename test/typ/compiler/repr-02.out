@@ -95,8 +95,8 @@ document(body: { text(body: [
                       size: 0.8em), 
                  text(body: [ ], size: 0.8em), 
                  linebreak(), 
-                 text(body: [(thickness: 2.0pt,
- color: rgb(96%,63%,1%,100%))], 
+                 text(body: [stroke(paint: rgb(96%,63%,1%,100%), 
+       thickness: 2.0pt)], 
                       size: 0.8em), 
                  parbreak(), 
                  text(body: [
