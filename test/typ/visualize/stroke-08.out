@@ -229,6 +229,94 @@
               (FuncCall
                  (Ident (Identifier "stroke"))
                  [ NormalArg
+                     (Plus (Literal (Numeric 2.0 Pt)) (Ident (Identifier "red")))
+                 , KeyValArg (Identifier "paint") (Literal Auto)
+                 ]))
+       , NormalArg (Literal Auto)
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 19 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "thickness"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg
+                     (Plus (Literal (Numeric 2.0 Pt)) (Ident (Identifier "red")))
+                 , KeyValArg (Identifier "thickness") (Literal Auto)
+                 ]))
+       , NormalArg (Literal Auto)
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 20 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "dash"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg
+                     (FuncCall
+                        (Ident (Identifier "stroke"))
+                        [ KeyValArg (Identifier "dash") (Literal (String "dashed")) ])
+                 , KeyValArg (Identifier "dash") (Literal Auto)
+                 ]))
+       , NormalArg (Literal Auto)
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 21 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "paint"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg
+                     (Dict [ Reg ( Ident (Identifier "paint") , Literal Auto ) ])
+                 ]))
+       , NormalArg (Literal Auto)
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 22 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "dash"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg
+                     (Dict
+                        [ Reg ( Ident (Identifier "thickness") , Literal Auto )
+                        , Reg ( Ident (Identifier "dash") , Literal (String "dotted") )
+                        ])
+                 ]))
+       , NormalArg (Literal (String "dotted"))
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 23 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "paint"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg
                      (Dict
                         [ Reg ( Ident (Identifier "paint") , Ident (Identifier "blue") )
                         , Reg ( Ident (Identifier "thickness") , Literal (Numeric 2.0 Pt) )
@@ -239,7 +327,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 19 , column 2 )
+    ( line 24 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -263,7 +351,7 @@
 , ParBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 21 , column 2 )
+    ( line 26 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -275,7 +363,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 22 , column 2 )
+    ( line 27 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -287,7 +375,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 23 , column 2 )
+    ( line 28 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -299,7 +387,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 24 , column 2 )
+    ( line 29 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -317,7 +405,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 25 , column 2 )
+    ( line 30 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -335,7 +423,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 26 , column 2 )
+    ( line 31 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -353,7 +441,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 27 , column 2 )
+    ( line 32 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -369,7 +457,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 28 , column 2 )
+    ( line 33 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -385,7 +473,7 @@
 , ParBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 30 , column 2 )
+    ( line 35 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -401,7 +489,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 31 , column 2 )
+    ( line 36 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -419,7 +507,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 33 , column 2 )
+    ( line 38 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -433,7 +521,7 @@
 , ParBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 35 , column 2 )
+    ( line 40 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -449,7 +537,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 36 , column 2 )
+    ( line 41 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -465,7 +553,7 @@
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
-    ( line 37 , column 2 )
+    ( line 42 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -480,6 +568,21 @@
 ]
 --- evaluated ---
 document(body: { parbreak(), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
                  text(body: [✅]), 
                  text(body: [
 ]), 

@@ -569,15 +569,18 @@ strokeConstructor =
     mbCap <- namedArg "cap" Nothing
     mbJoin <- namedArg "join" Nothing
     mbMiterLimit <- namedArg "miter-limit" Nothing
-    paint <- maybe (pure $ paint base) (fmap Just . asColor) mbPaint
-    thickness <- maybe (pure $ thickness base) (fmap Just . asLength) mbThickness
-    dash <- maybe (pure $ dash base) (fmap Just . toDashPattern) mbDash
-    cap <- maybe (pure $ cap base) (fmap Just . toCap) mbCap
-    join <- maybe (pure $ join base) (fmap Just . toJoin) mbJoin
-    pure $
-      VStroke $
-        Stroke paint thickness dash cap join $
-          maybe (miterLimit base) id mbMiterLimit
+    -- A named argument overrides the base field; auto resets it.
+    let override get f mb = case mb of
+          Nothing -> pure (get base)
+          Just VAuto -> pure Nothing
+          Just v -> Just <$> f v
+    paint <- override paint asColor mbPaint
+    thickness <- override thickness asLength mbThickness
+    dash <- override dash toDashPattern mbDash
+    cap <- override cap toCap mbCap
+    join <- override join toJoin mbJoin
+    miterLimit <- override miterLimit asMiterLimit mbMiterLimit
+    pure $ VStroke $ Stroke paint thickness dash cap join miterLimit
 
 loremWords :: [Text]
 loremWords =
@@ -776,18 +779,25 @@ getFileOrBytes = do
 -- @(paint: red, thickness: 2pt, dash: "dashed")@.
 strokeFromDict :: MonadFail m => OM.OMap Identifier Val -> m Stroke
 strokeFromDict m = do
-  paint <- mapM asColor (OM.lookup "paint" m)
-  thickness <- mapM asLength (OM.lookup "thickness" m)
-  dash <- mapM toDashPattern (OM.lookup "dash" m)
-  cap <- mapM toCap (OM.lookup "cap" m)
-  join <- mapM toJoin (OM.lookup "join" m)
-  miterLimit <-
-    case OM.lookup "miter-limit" m of
-      Nothing -> pure Nothing
-      Just (VFloat x) -> pure (Just x)
-      Just (VInteger x) -> pure (Just (fromIntegral x))
-      Just _ -> fail "miter-limit must be a float"
+  let field k f = case OM.lookup k m of
+        Nothing -> pure Nothing
+        Just VAuto -> pure Nothing
+        Just v -> Just <$> f v
+  paint <- field "paint" asColor
+  thickness <- field "thickness" asLength
+  dash <- field "dash" toDashPattern
+  cap <- field "cap" toCap
+  join <- field "join" toJoin
+  miterLimit <- field "miter-limit" asMiterLimit
+  -- typst errors on unexpected keys (dict.finish in stroke.rs)
+  case filter (`notElem` knownStrokeKeys) (map fst (OM.assocs m)) of
+    [] -> pure ()
+    (Identifier k : _) -> fail $ "unexpected key: " <> T.unpack k
   pure $ Stroke paint thickness dash cap join miterLimit
+
+knownStrokeKeys :: [Identifier]
+knownStrokeKeys =
+  ["paint", "thickness", "dash", "cap", "join", "miter-limit"]
 
 asColor :: MonadFail m => Val -> m Color
 asColor (VColor c) = pure c
@@ -796,6 +806,11 @@ asColor _ = fail "paint must be a color"
 asLength :: MonadFail m => Val -> m Length
 asLength (VLength l) = pure l
 asLength _ = fail "thickness must be a length"
+
+asMiterLimit :: MonadFail m => Val -> m Double
+asMiterLimit (VFloat x) = pure x
+asMiterLimit (VInteger x) = pure (fromIntegral x)
+asMiterLimit _ = fail "miter-limit must be a float"
 
 toDashPattern :: MonadFail m => Val -> m DashPattern
 toDashPattern (VString t)

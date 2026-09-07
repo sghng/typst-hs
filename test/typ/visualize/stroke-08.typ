@@ -15,6 +15,11 @@
 #test(stroke(join: "bevel").join, "bevel")
 #test(stroke(miter-limit: 8.0).miter-limit, 8.0)
 #test(stroke(2pt + red, thickness: 4pt).thickness, 4pt)
+#test(stroke(2pt + red, paint: auto).paint, auto)
+#test(stroke(2pt + red, thickness: auto).thickness, auto)
+#test(stroke(stroke(dash: "dashed"), dash: auto).dash, auto)
+#test(stroke((paint: auto)).paint, auto)
+#test(stroke((thickness: auto, dash: "dotted")).dash, "dotted")
 #test(stroke((paint: blue, thickness: 2pt)).paint, blue)
 #test(stroke(dash: (1pt, 2pt)).dash, (1pt, 2pt))
 
