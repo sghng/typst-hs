@@ -10,7 +10,8 @@ module Typst.Module.Standard
     loadFileText,
     getPath,
     applyPureFunction,
-    elementDefaults
+    elementDefaults,
+    strokeConstructor
   )
 where
 
@@ -400,9 +401,9 @@ types =
   , ("length", VType TLength)
   , ("alignment", VType TAlignment)
   , ("color", VType TColor)
-  -- Note: no ("stroke", VType TStroke) here: the stroke type's
-  -- binding is the stroke() constructor function in 'construct',
-  -- which would shadow it anyway (M.fromList keeps the last).
+  -- The stroke type is bound to VType, like other types; stroke(...)
+  -- works because VType values are callable via getConstructor.
+  , ("stroke", VType TStroke)
   , ("symbol", VType TSymbol)
   , ("str", VType TString)
   , ("label", VType TLabel)
@@ -543,38 +544,40 @@ construct =
                   <|> (nthArg 1 >>= hexToRGB)
               )
     ),
-    ( "stroke",
-      makeFunction $ do
-        base <-
-          nthArg 1 >>= \case
-            VNone -> pure emptyStroke
-            VStroke s -> pure s
-            VColor c -> pure emptyStroke { paint = Just c }
-            VLength l -> pure emptyStroke { thickness = Just l }
-            VDict m -> strokeFromDict m
-            _ -> fail "expected stroke, color, length, or dictionary"
-        mbPaint <- namedArg "paint" Nothing
-        mbThickness <- namedArg "thickness" Nothing
-        mbDash <- namedArg "dash" Nothing
-        mbCap <- namedArg "cap" Nothing
-        mbJoin <- namedArg "join" Nothing
-        mbMiterLimit <- namedArg "miter-limit" Nothing
-        paint <- maybe (pure $ paint base) (fmap Just . asColor) mbPaint
-        thickness <- maybe (pure $ thickness base) (fmap Just . asLength) mbThickness
-        dash <- maybe (pure $ dash base) (fmap Just . toDashPattern) mbDash
-        cap <- maybe (pure $ cap base) (fmap Just . toCap) mbCap
-        join <- maybe (pure $ join base) (fmap Just . toJoin) mbJoin
-        pure $
-          VStroke $
-            Stroke paint thickness dash cap join $
-              maybe (miterLimit base) id mbMiterLimit
-    ),
     ( "lorem",
       makeFunction $ do
         (num :: Int) <- nthArg 1
         pure $ VString $ T.unwords $ take num loremWords
     )
   ]
+
+-- | The stroke() constructor, also used by getConstructor for TStroke.
+strokeConstructor :: Val
+strokeConstructor =
+  makeFunction $ do
+    base <-
+      nthArg 1 >>= \case
+        VNone -> pure emptyStroke
+        VStroke s -> pure s
+        VColor c -> pure emptyStroke { paint = Just c }
+        VLength l -> pure emptyStroke { thickness = Just l }
+        VDict m -> strokeFromDict m
+        _ -> fail "expected stroke, color, length, or dictionary"
+    mbPaint <- namedArg "paint" Nothing
+    mbThickness <- namedArg "thickness" Nothing
+    mbDash <- namedArg "dash" Nothing
+    mbCap <- namedArg "cap" Nothing
+    mbJoin <- namedArg "join" Nothing
+    mbMiterLimit <- namedArg "miter-limit" Nothing
+    paint <- maybe (pure $ paint base) (fmap Just . asColor) mbPaint
+    thickness <- maybe (pure $ thickness base) (fmap Just . asLength) mbThickness
+    dash <- maybe (pure $ dash base) (fmap Just . toDashPattern) mbDash
+    cap <- maybe (pure $ cap base) (fmap Just . toCap) mbCap
+    join <- maybe (pure $ join base) (fmap Just . toJoin) mbJoin
+    pure $
+      VStroke $
+        Stroke paint thickness dash cap join $
+          maybe (miterLimit base) id mbMiterLimit
 
 loremWords :: [Text]
 loremWords =

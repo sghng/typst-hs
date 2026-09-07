@@ -33,3 +33,5 @@
 #test(stroke() == stroke(paint: black), false)
 
 #test(type(stroke(1pt)), "stroke")
+#test(type(stroke(1pt)), stroke)
+#test(type(1pt + red), stroke)

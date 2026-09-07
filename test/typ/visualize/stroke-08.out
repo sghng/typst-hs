@@ -446,6 +446,36 @@
               ])
        , NormalArg (Literal (String "stroke"))
        ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 36 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FuncCall
+              (Ident (Identifier "type"))
+              [ NormalArg
+                  (FuncCall
+                     (Ident (Identifier "stroke"))
+                     [ NormalArg (Literal (Numeric 1.0 Pt)) ])
+              ])
+       , NormalArg (Ident (Identifier "stroke"))
+       ])
+, SoftBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 37 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FuncCall
+              (Ident (Identifier "type"))
+              [ NormalArg
+                  (Plus (Literal (Numeric 1.0 Pt)) (Ident (Identifier "red")))
+              ])
+       , NormalArg (Ident (Identifier "stroke"))
+       ])
 , ParBreak
 ]
 --- evaluated ---
@@ -533,5 +563,11 @@ document(body: { parbreak(),
 ]), 
                  text(body: [✅]), 
                  parbreak(), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
                  text(body: [✅]), 
                  parbreak() })
