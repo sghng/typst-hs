@@ -547,10 +547,10 @@ construct =
       makeFunction $ do
         base <-
           nthArg 1 >>= \case
-            VNone -> pure defaultStroke
+            VNone -> pure emptyStroke
             VStroke s -> pure s
-            VColor c -> pure defaultStroke { paint = c }
-            VLength l -> pure defaultStroke { thickness = l }
+            VColor c -> pure emptyStroke { paint = Just c }
+            VLength l -> pure emptyStroke { thickness = Just l }
             VDict m -> strokeFromDict m
             _ -> fail "expected stroke, color, length, or dictionary"
         mbPaint <- namedArg "paint" Nothing
@@ -559,8 +559,8 @@ construct =
         mbCap <- namedArg "cap" Nothing
         mbJoin <- namedArg "join" Nothing
         mbMiterLimit <- namedArg "miter-limit" Nothing
-        paint <- maybe (pure $ paint base) asColor mbPaint
-        thickness <- maybe (pure $ thickness base) asLength mbThickness
+        paint <- maybe (pure $ paint base) (fmap Just . asColor) mbPaint
+        thickness <- maybe (pure $ thickness base) (fmap Just . asLength) mbThickness
         dash <- maybe (pure $ dash base) (fmap Just . toDashPattern) mbDash
         cap <- maybe (pure $ cap base) (fmap Just . toCap) mbCap
         join <- maybe (pure $ join base) (fmap Just . toJoin) mbJoin
@@ -773,9 +773,8 @@ getFileOrBytes = do
 -- @(paint: red, thickness: 2pt, dash: "dashed")@.
 strokeFromDict :: MonadFail m => OM.OMap Identifier Val -> m Stroke
 strokeFromDict m = do
-  paint <- maybe (pure $ paint defaultStroke) asColor (OM.lookup "paint" m)
-  thickness <-
-    maybe (pure $ thickness defaultStroke) asLength (OM.lookup "thickness" m)
+  paint <- mapM asColor (OM.lookup "paint" m)
+  thickness <- mapM asLength (OM.lookup "thickness" m)
   dash <- mapM toDashPattern (OM.lookup "dash" m)
   cap <- mapM toCap (OM.lookup "cap" m)
   join <- mapM toJoin (OM.lookup "join" m)

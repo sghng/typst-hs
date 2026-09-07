@@ -156,8 +156,8 @@ getMethod updateVal val fld = do
         _ -> noMethod "Color" fld
     VStroke s ->
       case fld of
-        "paint" -> pure $ VColor (paint s)
-        "thickness" -> pure $ VLength (thickness s)
+        "paint" -> pure $ maybe VAuto VColor (paint s)
+        "thickness" -> pure $ maybe VAuto VLength (thickness s)
         "dash" -> pure $ maybe VAuto dashToVal (dash s)
         "cap" -> pure $ maybe VAuto VString (cap s)
         "join" -> pure $ maybe VAuto VString (join s)

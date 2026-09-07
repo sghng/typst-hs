@@ -33,9 +33,33 @@
        , NormalArg (Literal (Numeric 2.0 Pt))
        ])
 , SoftBreak
-, Comment
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 5 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "thickness"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ KeyValArg (Identifier "paint") (Ident (Identifier "blue")) ]))
+       , NormalArg (Literal Auto)
+       ])
 , SoftBreak
-, Comment
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 6 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (FieldAccess
+              (Ident (Identifier "paint"))
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ NormalArg (Literal (Numeric 3.0 Pt)) ]))
+       , NormalArg (Literal Auto)
+       ])
 , SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
@@ -390,10 +414,26 @@
                  [ NormalArg (Literal (Numeric 2.0 Pt)) ]))
        , NormalArg (Literal (Boolean False))
        ])
-, ParBreak
+, SoftBreak
+, Comment
+, SoftBreak
 , Code
     "typ/visualize/stroke-08.typ"
     ( line 33 , column 2 )
+    (FuncCall
+       (Ident (Identifier "test"))
+       [ NormalArg
+           (Equals
+              (FuncCall (Ident (Identifier "stroke")) [])
+              (FuncCall
+                 (Ident (Identifier "stroke"))
+                 [ KeyValArg (Identifier "paint") (Ident (Identifier "black")) ]))
+       , NormalArg (Literal (Boolean False))
+       ])
+, ParBreak
+, Code
+    "typ/visualize/stroke-08.typ"
+    ( line 35 , column 2 )
     (FuncCall
        (Ident (Identifier "test"))
        [ NormalArg
@@ -416,8 +456,19 @@ document(body: { parbreak(),
                  text(body: [✅]), 
                  text(body: [
 ]), 
+                 text(body: [✅]), 
                  text(body: [
 ]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
                  text(body: [
 ]), 
                  text(body: [✅]), 
@@ -435,6 +486,20 @@ document(body: { parbreak(),
                  text(body: [✅]), 
                  text(body: [
 ]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 text(body: [
+]), 
+                 text(body: [✅]), 
+                 parbreak(), 
                  text(body: [✅]), 
                  text(body: [
 ]), 
@@ -464,24 +529,6 @@ document(body: { parbreak(),
                  text(body: [✅]), 
                  text(body: [
 ]), 
-                 text(body: [✅]), 
-                 text(body: [
-]), 
-                 text(body: [✅]), 
-                 text(body: [
-]), 
-                 text(body: [✅]), 
-                 text(body: [
-]), 
-                 text(body: [✅]), 
-                 text(body: [
-]), 
-                 text(body: [✅]), 
-                 text(body: [
-]), 
-                 text(body: [✅]), 
-                 parbreak(), 
-                 text(body: [✅]), 
                  text(body: [
 ]), 
                  text(body: [✅]), 

@@ -41,7 +41,7 @@ module Typst.Types
     Color (..),
     Stroke (..),
     DashPattern (..),
-    defaultStroke,
+    emptyStroke,
     mergeStrokes,
     Direction (..),
     Identifier (..), -- reexported
@@ -488,12 +488,12 @@ instance Summable Val where
   -- A color or length sets the corresponding component of the stroke;
   -- when two strokes are added, the right operand's fields take precedence.
   maybePlus (VColor c) (VLength l) =
-    pure $ VStroke $ defaultStroke { paint = c, thickness = l }
+    pure $ VStroke $ emptyStroke { paint = Just c, thickness = Just l }
   maybePlus (VLength l) (VColor c) = maybePlus (VColor c) (VLength l)
-  maybePlus (VStroke s) (VColor c) = pure $ VStroke s { paint = c }
-  maybePlus (VColor c) (VStroke s) = pure $ VStroke s { paint = c }
-  maybePlus (VStroke s) (VLength l) = pure $ VStroke s { thickness = l }
-  maybePlus (VLength l) (VStroke s) = pure $ VStroke s { thickness = l }
+  maybePlus (VStroke s) (VColor c) = pure $ VStroke s { paint = Just c }
+  maybePlus (VColor c) (VStroke s) = pure $ VStroke s { paint = Just c }
+  maybePlus (VStroke s) (VLength l) = pure $ VStroke s { thickness = Just l }
+  maybePlus (VLength l) (VStroke s) = pure $ VStroke s { thickness = Just l }
   maybePlus (VStroke s1) (VStroke s2) = pure $ VStroke $ mergeStrokes s1 s2
   maybePlus v1 v2 = fail $ "could not add " <> show v1 <> " and " <> show v2
 
@@ -847,8 +847,8 @@ data Color
   deriving (Show, Eq, Ord, Typeable)
 
 data Stroke = Stroke
-  { paint :: !Color,
-    thickness :: !Length,
+  { paint :: !(Maybe Color), -- Nothing = auto (default: black)
+    thickness :: !(Maybe Length), -- Nothing = auto (default: 1pt)
     dash :: !(Maybe DashPattern),
     cap :: !(Maybe Text),
     join :: !(Maybe Text),
@@ -861,16 +861,16 @@ data DashPattern
   | LengthDash ![Length]
   deriving (Show, Eq, Typeable)
 
--- | The default stroke: 1pt black, solid.
-defaultStroke :: Stroke
-defaultStroke = Stroke (RGB 0 0 0 1) (LExact 1.0 LPt) Nothing Nothing Nothing Nothing
+-- | A stroke with every field unset (auto).
+emptyStroke :: Stroke
+emptyStroke = Stroke Nothing Nothing Nothing Nothing Nothing Nothing
 
--- | Merge two strokes; fields of the second take precedence.
+-- | Merge two strokes; fields set in the second take precedence.
 mergeStrokes :: Stroke -> Stroke -> Stroke
 mergeStrokes s1 s2 =
   Stroke
-    { paint = paint s2,
-      thickness = thickness s2,
+    { paint = orElse (paint s2) (paint s1),
+      thickness = orElse (thickness s2) (thickness s1),
       dash = orElse (dash s2) (dash s1),
       cap = orElse (cap s2) (cap s1),
       join = orElse (join s2) (join s1),
@@ -941,8 +941,16 @@ prettyVal expr =
       "stroke("
         <> P.cat
           ( P.punctuate ", " $
-              [ "paint: " <> prettyVal (VColor (paint s)),
-                "thickness: " <> prettyVal (VLength (thickness s))
+              [ "paint: "
+                  <> maybe
+                    (prettyVal (VColor (RGB 0 0 0 1)))
+                    (prettyVal . VColor)
+                    (paint s),
+                "thickness: "
+                  <> maybe
+                    (prettyVal (VLength (LExact 1.0 LPt)))
+                    (prettyVal . VLength)
+                    (thickness s)
               ]
                 ++ [ "dash: " <> dashDoc d | Just d <- [dash s] ]
                 ++ [ "cap: " <> prettyVal (VString c) | Just c <- [cap s] ]

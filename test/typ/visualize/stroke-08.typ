@@ -2,8 +2,8 @@
 
 #test(stroke(2pt + red).paint, red)
 #test(stroke(2pt + red).thickness, 2pt)
-// NOTE: thickness/paint are materialized from defaults rather than auto
-// (known deviation from typst, see PR #76 discussion)
+#test(stroke(paint: blue).thickness, auto)
+#test(stroke(3pt).paint, auto)
 #test(stroke(red).cap, auto)
 #test(stroke(red).join, auto)
 #test(stroke(red).dash, auto)
@@ -29,5 +29,7 @@
 
 #test(stroke(1pt) == stroke(1pt), true)
 #test(stroke(1pt) == stroke(2pt), false)
+// an explicitly set field differs from auto, as in typst
+#test(stroke() == stroke(paint: black), false)
 
 #test(type(stroke(1pt)), "stroke")
